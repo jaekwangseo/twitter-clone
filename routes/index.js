@@ -1,19 +1,30 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const tweetBank = require('../tweetBank');
+//const tweetBank = require('../tweetBank');
+const dbClient = require('../db');
 
 module.exports = io => {
 
   // a reusable function
   const respondWithAllTweets = (req, res, next) => {
+
+    /*
     const allTheTweets = tweetBank.list();
     res.render('index', {
       title: 'Twitter.js',
       tweets: allTheTweets,
       showForm: true
+    });*/
+
+    dbClient.query('SELECT * FROM tweets', function (err, result) {
+      if (err) return next(err); // pass errors to Express
+      var tweets = result.rows;
+      console.log(tweets);
+      res.render('index', { title: 'Twitter.js', tweets: tweets, showForm: true });
     });
   }
+
 
   // here we basically treet the root view and tweets view as identical
   router.get('/', respondWithAllTweets);
